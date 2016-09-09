@@ -8,7 +8,7 @@ Uso
 ----------------------------------
 ### Obtener parámetros de sistema
 ```bash
-# configurador
+configurador
 ```
 
 Obtiene los parámetros de sistema actualmente aplicados. Devuelve una lista de lineas del tipo clave=valor. Por ejemplo:
@@ -28,16 +28,16 @@ subida=2
 Para la aplicación de los parámetros de sistema se generará una tarea en el demonio `cron` del usuario `root`
 
 ```bash
-# configurador --set
+configurador --set
 ```
 
 Lista de parámetros
 ------------------------------------------------
 * **dhcp (opcional)**: Indica si se obtiene la configuración de red automaticamente desde un servidor DHCP. Valor por defecto: __no__
-* **ip (obligatorio si dhcp=no)**:  Dirección IPv4 del dispositivo
-* **mascara (obligatorio si dhcp=no)**: Máscara de subred
-* **gateway (obligatorio si dhcp=no)**: Puerta de enlace predeterminada
-* **dns1 (obligatorio si dhcp=no)**: Servidor de nombres primario
+* **ip (obligatorio si `dhcp=no`)**:  Dirección IPv4 del dispositivo
+* **mascara (obligatorio si `dhcp=no`)**: Máscara de subred
+* **gateway (obligatorio si `dhcp=no`)**: Puerta de enlace predeterminada
+* **dns1 (obligatorio si `dhcp=no`)**: Servidor de nombres primario
 * **dns2 (opcional)**: Servidor de nombres alternativo
 * **bajada (obligatorio)**: Ancho de banda de bajada (en Megabits por segundo) que posee el enlace de Internet
 * **subida (obligatorio)**: Ancho de banda de subida (en Megabits por segundo) que posee el enlace de Internet
