@@ -33,27 +33,36 @@ Para la aplicación de los parámetros de sistema se generará una tarea en el d
 
 Lista de parámetros
 ------------------------------------------------
-Nombre de parámetro | Descripción                    | Valores válidos | Obligatorio
-------------------- | ------------------------------ | --------------- | --------------------
-**dhcp**            | Indica si se obtiene la        | si/SI           | Si
-                    | configuración de red           | no/NO           |
-                    | automaticamente desde un       |                 |
-                    | servidor DHCP                  |                 |
-------------------- | ------------------------------ | --------------- | --------------------
-**ip**              | Dirección IPv4 del dispositivo | 192.168.1.2     | Siempre que `dchp=no`
-------------------- | ------------------------------ | --------------- | --------------------
-**mascara**         | Máscara de subred              | 255.255.255.0   | Siempre que `dchp=no`
-------------------- | ------------------------------ | --------------- | --------------------
-**gateway**         | Puerta de enlace predeterminada| 192.168.1.1     | Siempre que `dchp=no`
-------------------- | ------------------------------ | --------------- | --------------------
-**dns1**            | Servidor de nombres primario   | 192.168.1.1     | Siempre que `dchp=no`
-------------------- | ------------------------------ | --------------- | --------------------
-**dns2**            | Servidor de nombres alternativo| 192.168.1.1     | No
-------------------- | ------------------------------ | --------------- | --------------------
-**bajada**          | Ancho de banda de bajada       | 10              | Si
-                    | (en Megabits por segundo) que  |                 |
-                    | posee el enlace de Internet    |                 |
-------------------- | ------------------------------ | --------------- | --------------------
-**subida**          | Ancho de banda de subida       | 10              | Si
-                    | (en Megabits por segundo) que  |                 |
-                    | posee el enlace de Internet    |                 |
+* **dhcp (opcional)**: Indica si se obtiene la configuración de red automaticamente desde un servidor DHCP. Valor por defecto: __no__
+* **ip (obligatorio si dhcp=no)**:  Dirección IPv4 del dispositivo
+* **mascara (obligatorio si dhcp=no)**: Máscara de subred
+* **gateway (obligatorio si dhcp=no)**: Puerta de enlace predeterminada
+* **dns1 (obligatorio si dhcp=no)**: Servidor de nombres primario
+* **dns2 (opcional)**: Servidor de nombres alternativo
+* **bajada (obligatorio)**: Ancho de banda de bajada (en Megabits por segundo) que posee el enlace de Internet
+* **subida (obligatorio)**: Ancho de banda de subida (en Megabits por segundo) que posee el enlace de Internet
+
+Ejemplos
+------------------------------------------------
+```ini
+dhcp=si
+bajada=3
+subida=0.5
+```
+```ini
+ip=192.168.1.122
+mascara=255.255.255.0
+gateway=192.168.1.1
+dns1=192.168.1.1
+bajada=3
+subida=0.5
+```
+```ini
+dhcp=no
+ip=172.16.1.254
+mascara=255.255.255.0
+gateway=172.16.1.1
+dns1=8.8.8.8
+bajada=50
+subida=50
+```
