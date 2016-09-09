@@ -44,11 +44,13 @@ Lista de parámetros
 
 Ejemplos
 ------------------------------------------------
+### Configuración por defecto
 ```ini
 dhcp=si
-bajada=3
-subida=0.5
+bajada=1024
+subida=1024
 ```
+### Se configura la red manualmente y no se especifica valor para DHCP
 ```ini
 ip=192.168.1.122
 mascara=255.255.255.0
@@ -57,6 +59,7 @@ dns1=192.168.1.1
 bajada=3
 subida=0.5
 ```
+### Se especifica la red manualmente y se explicita el parametro DHCP
 ```ini
 dhcp=no
 ip=172.16.1.254
