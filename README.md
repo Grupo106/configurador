@@ -2,7 +2,7 @@ Configurador
 ==================================
 > Encargado de configurar los parámetros de sistema como la configuración de red, del ancho de banda disponible y los servidores de nombre
 
-Por razones de seguridad el script lee un archivo desde el directorio temporal `/tmp` (generado por la interfaz de usuario por el usuario sin privilegio `www-data`) y escribe los archivos correspondientes con privilegio de Administrador.
+Por razones de seguridad el script lee el archivo  temporal `/tmp/netcop-cfg.tmp` (generado por la interfaz de usuario por el usuario sin privilegio `www-data`) y escribe los archivos correspondientes con privilegio de Administrador.
 
 Uso
 ----------------------------------
