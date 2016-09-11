@@ -1,8 +1,12 @@
 Configurador
 ==================================
-> Encargado de configurar los parámetros de sistema como la configuración de red, del ancho de banda disponible y los servidores de nombre
+> Encargado de configurar los parámetros de sistema como la configuración de
+> red, del ancho de banda disponible y los servidores de nombre
 
-Por razones de seguridad el script lee el archivo  temporal `/tmp/netcop-cfg.tmp` (generado por la interfaz de usuario por el usuario sin privilegio `www-data`) y escribe los archivos correspondientes con privilegio de Administrador.
+Por razones de seguridad el script lee el archivo  temporal
+`/tmp/netcop-cfg.tmp` (generado por la interfaz de usuario por el usuario sin
+privilegio `www-data`) y escribe los archivos correspondientes con privilegio
+de Administrador.
 
 Uso
 ----------------------------------
@@ -11,7 +15,8 @@ Uso
 configurador
 ```
 
-Obtiene los parámetros de sistema actualmente aplicados. Devuelve una lista de lineas del tipo clave=valor. Por ejemplo:
+Obtiene los parámetros de sistema actualmente aplicados. Devuelve una lista de
+lineas del tipo clave=valor. Por ejemplo:
 
 ```ini
 $ configurador
@@ -25,7 +30,8 @@ subida=2
 ```
 
 ### Establecer parámetros de sistema
-Para la aplicación de los parámetros de sistema se generará una tarea en el demonio `cron` del usuario `root`
+Para la aplicación de los parámetros de sistema se generará una tarea en el
+demonio `cron` del usuario `root`
 
 ```bash
 configurador --set
@@ -33,14 +39,17 @@ configurador --set
 
 Lista de parámetros
 ------------------------------------------------
-* **dhcp (opcional)**: Indica si se obtiene la configuración de red automaticamente desde un servidor DHCP. Valor por defecto: __no__
+* **dhcp (opcional)**: Indica si se obtiene la configuración de red
+  automaticamente desde un servidor DHCP. Valor por defecto: __no__
 * **ip (obligatorio si `dhcp=no`)**:  Dirección IPv4 del dispositivo
 * **mascara (obligatorio si `dhcp=no`)**: Máscara de subred
 * **gateway (obligatorio si `dhcp=no`)**: Puerta de enlace predeterminada
 * **dns1 (obligatorio si `dhcp=no`)**: Servidor de nombres primario
 * **dns2 (opcional)**: Servidor de nombres alternativo
-* **bajada (obligatorio)**: Ancho de banda de bajada (en Megabits por segundo) que posee el enlace de Internet
-* **subida (obligatorio)**: Ancho de banda de subida (en Megabits por segundo) que posee el enlace de Internet
+* **bajada (obligatorio)**: Ancho de banda de bajada (en Megabits por segundo)
+  que posee el enlace de Internet
+* **subida (obligatorio)**: Ancho de banda de subida (en Megabits por segundo)
+  que posee el enlace de Internet
 
 Ejemplos
 ------------------------------------------------
