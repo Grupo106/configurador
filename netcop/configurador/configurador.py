@@ -65,8 +65,6 @@ def recargar_red():
                            'Verifique privilegios.')
 
 def configurar():
-    with open(filename, "r") as sources:
-	lines = sources.readlines()
     with open(filename, "w") as sources:
 	for line in lines:
 	    sources.write(re.sub(r'^# deb', 'deb', line))
