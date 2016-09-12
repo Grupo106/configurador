@@ -42,15 +42,18 @@ def validar(parametros):
 
     En caso de que los parametros sean incorrectos, lanza ValueError
     '''
-    regex_dhcp = re.compile('^(si|no)$')
+    regex_dhcp = re.compile('^(si|no)$', flags=re.I)
     regex_ip = re.compile('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
                           '(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+    regex_velocidad = re.compile('^\d+$')
     FIELDS = (('dhcp', regex_dhcp),
               ('ip', regex_ip),
               ('mascara', regex_ip),
               ('gateway', regex_ip),
               ('dns1', regex_ip),
-              ('dns2', regex_ip))
+              ('dns2', regex_ip),
+              ('subida', regex_velocidad),
+              ('bajada', regex_velocidad),)
     # valida formato de los parametros
     for field, regex in FIELDS:
         if parametros.get(field) and not regex.match(parametros.get(field)):
@@ -64,6 +67,9 @@ def validar(parametros):
                 parametros.get('gateway') and parametros.get('dns1')):
             raise ValueError('Si dhcp=no debe ingresar ip, mascara, gateway y '
                              'dns1 obligatoriamente')
+    # subida y bajada son obligatorios
+    if not parametros.get('bajada') or not parametros.get('subida'):
+        raise ValueError('bajada y subida son obligatorios')
 
 
 def leer_temporal():
@@ -91,7 +97,23 @@ def obtener_config():
     Lee configuraciones actualmente aplicadas e imprime resultado en formato
     clave=valor.
     '''
-    pass
+    regex = re.compile('(bajada=(?P<bajada>\d+)|'
+                        'subida=(?P<subida>\d+)|'
+                        '(?P<dhcp>dhcp)|'
+                        'address (?P<ip>(\d+\.?){4})|'
+                        'netmask (?P<mascara>(\d+\.?){4})|'
+                        'gateway (?P<gateway>(\d+\.?){4}))', flags=re.M)
+
+    config = dict()
+    for path in (NETCOP_CONFIG_FILE, ):
+        with open(path) as f:
+            content = f.read()
+        m = regex.search(content)
+        if m:
+            for x in regex.finditer(content):
+                a = {k:v for k, v in x.groupdict().items() if v}
+                config.update(a)
+    return config
 
 
 def recargar_red():
@@ -129,7 +151,5 @@ def configurar():
     for path, template_name in FILES:
         template = env.get_template(template_name)
         config = template.render(**contexto)
-        print path
-        print config
-        # with open(path, 'w') as f:
-        #    f.write(config)
+        with open(path, 'w') as f:
+            f.write(config)
