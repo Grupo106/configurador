@@ -10,8 +10,11 @@ privilegio `www-data`) y escribe los archivos correspondientes con privilegio
 de Administrador.
 '''
 import os
+import re
 import subprocess
 import configparser
+from . import config
+from jinja2 import Environment, PackageLoader
 
 # Ubicacion de arhivos
 # -------------------------------------------------------------------------
@@ -24,11 +27,44 @@ DNS_CONFIG_FILE = '/etc/resolv.conf'
 # archivo de configuracion de netcop
 NETCOP_CONFIG_FILE = '/etc/netcop/netcop.conf'
 
+
 def existe_archivo_temporal():
     '''
     Verifica que exista el archivo temporal creado por la UI.
     '''
     return os.path.isfile(TMP_CONFIG_FILE)
+
+
+def validar(parametros):
+    '''
+    Valida que los parametros guardados en la configuracion temporal sean
+    correctos.
+
+    En caso de que los parametros sean incorrectos, lanza ValueError
+    '''
+    regex_dhcp = re.compile('^(si|no)$')
+    regex_ip = re.compile('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
+                          '(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+    FIELDS = (('dhcp', regex_dhcp),
+              ('ip', regex_ip),
+              ('mascara', regex_ip),
+              ('gateway', regex_ip),
+              ('dns1', regex_ip),
+              ('dns2', regex_ip))
+    # valida formato de los parametros
+    for field, regex in FIELDS:
+        if parametros.get(field) and not regex.match(parametros.get(field)):
+            raise ValueError(
+                '{field} {value}: formato invalido'.format(
+                    field=field, value=parametros.get(field))
+            )
+    # si dhcp=no, se debe ingresar ip, mascara, gateway y dns1
+    if not parametros.get('dhcp') or parametros['dhcp'].lower() == 'no':
+        if not (parametros.get('ip') and parametros.get('mascara') and
+                parametros.get('gateway') and parametros.get('dns1')):
+            raise ValueError('Si dhcp=no debe ingresar ip, mascara, gateway y '
+                             'dns1 obligatoriamente')
+
 
 def leer_temporal():
     '''
@@ -37,10 +73,11 @@ def leer_temporal():
     '''
     # agrega una seccion dummy porque asi lo espera el configparser
     with open(TMP_CONFIG_FILE, 'r') as f:
-	config_string = u'[netcop]\n' + f.read()
+        config_string = u'[netcop]\n' + f.read()
     config = configparser.ConfigParser()
     config.read_string(config_string)
     return {key: value for key, value in config.items('netcop')}
+
 
 def borrar_temporal():
     '''
@@ -48,12 +85,14 @@ def borrar_temporal():
     '''
     return os.remove(TMP_CONFIG_FILE)
 
+
 def obtener_config():
     '''
     Lee configuraciones actualmente aplicadas e imprime resultado en formato
     clave=valor.
     '''
     pass
+
 
 def recargar_red():
     '''
@@ -64,7 +103,33 @@ def recargar_red():
         raise RuntimeError('No se pudo recargar la configuración de red. '
                            'Verifique privilegios.')
 
+
+def obtener_contexto():
+    '''
+    Obtiene el contexto que se le pasaran a los templates.
+    '''
+    contexto = leer_temporal()
+    validar(contexto)
+    contexto.update(config.DATABASE)
+    contexto.update(config.NETCOP)
+    return contexto
+
+
 def configurar():
-    with open(filename, "w") as sources:
-	for line in lines:
-	    sources.write(re.sub(r'^# deb', 'deb', line))
+    '''
+    Escribe configuracion en los archivos correspondientes.
+    '''
+    FILES = (
+        (NETWORK_CONFIG_FILE, 'br0.j2'),
+        (DNS_CONFIG_FILE, 'resolv.conf.j2'),
+        (NETCOP_CONFIG_FILE, 'netcop.config.j2'),
+    )
+    contexto = obtener_contexto()
+    env = Environment(loader=PackageLoader(__package__))
+    for path, template_name in FILES:
+        template = env.get_template(template_name)
+        config = template.render(**contexto)
+        print path
+        print config
+        # with open(path, 'w') as f:
+        #    f.write(config)

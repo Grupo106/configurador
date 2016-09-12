@@ -1,0 +1,9 @@
+{% if dns1 %}
+#############################################################################
+# Archivo mantenido por Netcop. No editar desde aqui, hacerlo desde la web  #
+#############################################################################
+domain local.lan
+search local.lan
+nameserver {{ dns1 }}
+{% if dns2 %}nameserver {{ dns2 }}{% endif %}
+{% endif %}

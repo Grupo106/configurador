@@ -1,0 +1,13 @@
+#############################################################################
+# Archivo mantenido por Netcop. No editar desde aqui, hacerlo desde la web  #
+#############################################################################
+{% if dhcp and dhcp|lower() == 'si' %}
+iface br0 inet dhcp
+    bridge_ports {{ outside }} {{ inside }}
+{% else %}
+iface br0 inet static
+    address {{ ip }}
+    netmask {{ mascara }}
+    gateway {{ gateway }}
+    bridge_ports {{ outside }} {{ inside }}
+{% endif %}

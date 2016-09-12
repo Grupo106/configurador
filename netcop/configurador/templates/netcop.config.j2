@@ -1,0 +1,28 @@
+#############################################################################
+# Archivo mantenido por Netcop. No editar desde aqui, hacerlo desde la web  #
+#############################################################################
+[netcop]
+# Interfaz que va conectada al router hacia Internet
+outside={{ outside }}
+# Interfaz que va conectada al switch hacia la LAN
+inside={{ inside }}
+# url donde consultara la ultima version de firmas
+url_version={{ url_version }}
+# url donde descargara la ultima version de firmas
+url_download={{ url_download }}
+# archivo donde guardara la ultima version de firmas instalada
+local_version={{ local_version }}
+# velocidad del enlace de Internet de bajada en mbit por segundo
+velocidad_bajada={{ bajada }}
+# velocidad del enlace de Internet de subida en mbit por segundo
+velocidad_subida={{ subida }}
+
+[database]
+# si esta vacio se conecta mediante socket de unix
+host=
+# nombre de base de datos
+database={{ database }}
+# usuario de base de datos
+user={{ user }}
+# contraseña de base de datos
+password={{ password }}
