@@ -107,6 +107,8 @@ def procesar_parametros(config, parametros):
     # corrijo valor para dhcp
     if parametros.get('dhcp'):
         parametros['dhcp'] = 'si'
+    else:
+        parametros['dhcp'] = 'no'
     # actualizo configuracion
     config.update(parametros)
 
