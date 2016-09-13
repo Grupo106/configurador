@@ -204,6 +204,9 @@ class ConfiguradorTests(unittest.TestCase):
         configurador.procesar_parametros(config, {'dns': '2.2.2.2'})
         assert config['dns1'] == '1.1.1.1'
         assert config['dns2'] == '2.2.2.2'
+        configurador.procesar_parametros(config, {'dns': '3.3.3.3'})
+        assert config['dns1'] == '1.1.1.1'
+        assert config['dns2'] == '3.3.3.3'
 
     def test_procesar_parametros_dhcp(self):
         '''
