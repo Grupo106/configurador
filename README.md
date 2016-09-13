@@ -1,4 +1,5 @@
 [![GitHub tag](https://img.shields.io/github/tag/Grupo106/configurador.svg?maxAge=2592000?style=plastic)](https://github.com/Grupo106/configurador/releases)
+[![Build Status](https://travis-ci.org/Grupo106/configurador.svg?branch=master)](https://travis-ci.org/Grupo106/configurador)
 [![Code Climate](https://codeclimate.com/github/Grupo106/configurador/badges/gpa.svg)](https://codeclimate.com/github/Grupo106/configurador)
 
 Configurador
