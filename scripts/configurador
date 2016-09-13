@@ -43,6 +43,6 @@ try:
             print "%s=%s" % (clave, valor)
 
 except Exception as e:
-    syslog.syslog(syslog.LOG_CRIT, str(e))
-    print >> sys.stderr, str(e)
+    syslog.syslog(syslog.LOG_CRIT,"%s - %s" % (e.__class__, str(e)))
+    print >> sys.stderr, e.__class__, str(e)
     sys.exit(1)
