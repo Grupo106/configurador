@@ -304,3 +304,28 @@ class ConfiguradorTests(unittest.TestCase):
             configurador.aplicar_cambios()
         mock_call.assert_called_with(['systemctl', 'reload',
                                       'networking.service'])
+
+    @mock.patch('netcop.configurador.configurador.leer_temporal')
+    @mock.patch('netcop.configurador.configurador.validar')
+    def test_obtener_contexto(self, mock_validar, mock_leer):
+        '''
+        Prueba la funcion que provee el contexto a los templates.
+        '''
+        mock_leer.return_value = {}
+        assert configurador.obtener_contexto()
+        mock_leer.assert_called()
+        mock_validar.assert_called()
+
+    @mock.patch('netcop.configurador.configurador.obtener_contexto')
+    def test_configurar(self, mock_contexto):
+        '''
+        Prueba la funcion que provee el contexto a los templates.
+        '''
+        mock_contexto.return_value = {}
+        mock_open = mock.mock_open()
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            configurador.configurar()
+        mock_contexto.assert_called()
+        mock_open.assert_any_call(configurador.NETCOP_CONFIG_FILE, 'w')
+        mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE, 'w')
+        mock_open.assert_any_call(configurador.DNS_CONFIG_FILE, 'w')

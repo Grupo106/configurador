@@ -149,7 +149,7 @@ def aplicar_cambios():
 
 def obtener_contexto():
     '''
-    Obtiene el contexto que se le pasaran a los templates.
+    Obtiene el contexto que se le proveerá a los templates.
     '''
     contexto = leer_temporal()
     validar(contexto)
