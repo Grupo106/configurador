@@ -93,7 +93,6 @@ class ConfiguradorTests(unittest.TestCase):
         cuando dhcp=no
         '''
         parametros = {
-            'dhcp': 'no',
             'subida': '1',
             'bajada': '1',
         }
