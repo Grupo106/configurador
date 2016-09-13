@@ -25,7 +25,7 @@ NETWORK_CONFIG_FILE = '/etc/network/interfaces.d/br0'
 # archivo de configuracion de servidores de nombre
 DNS_CONFIG_FILE = '/etc/resolv.conf'
 # archivo de configuracion de netcop
-NETCOP_CONFIG_FILE = '/etc/netcop/netcop.conf'
+NETCOP_CONFIG_FILE = '/etc/netcop/netcop.config'
 
 
 def existe_archivo_temporal():
@@ -112,23 +112,21 @@ def procesar_parametros(config, parametros):
 
 def obtener_config():
     '''
-    Lee configuraciones actualmente aplicadas e imprime resultado en formato
-    clave=valor.
+    Lee configuraciones actualmente aplicadas.
     '''
     regex = re.compile(
-        '''(
-            bajada=(?P<bajada>\d+) |
-            subida=(?P<subida>\d+) |
-            (?P<dhcp>dhcp) |
-            address (?P<ip>(\d+\.?){4}) |
-            netmask (?P<mascara>(\d+\.?){4}) |
-            gateway (?P<gateway>(\d+\.?){4}) |
-            dns (?P<dns>(\d+\.?){4})
+        '''(bajada=(?P<bajada>\d+) |                   # bajada
+            subida=(?P<subida>\d+) |                   # subida
+            (?P<dhcp>dhcp) |                           # dhcp
+            address\s+(?P<ip>(\d+\.?){4}) |            # ip
+            netmask\s+(?P<mascara>(\d+\.?){4}) |       # mascara
+            gateway\s+(?P<gateway>(\d+\.?){4}) |       # gateway
+            nameserver\s+(?P<dns>(\d+\.?){4})          # dns1 o dns2
         )''',
         flags=re.M | re.X
     )
     config = {}
-    for path in (NETCOP_CONFIG_FILE, ):
+    for path in (NETCOP_CONFIG_FILE, NETWORK_CONFIG_FILE, DNS_CONFIG_FILE):
         with open(path) as f:
             for m in regex.finditer(f.read()):
                 params = {k: v for k, v in m.groupdict().items() if v}
