@@ -57,10 +57,10 @@ def validar(parametros):
     # valida formato de los parametros
     for field, regex in FIELDS:
         if parametros.get(field) and not regex.match(parametros.get(field)):
-            raise ValueError(
-                '{field} {value}: formato invalido'.format(
-                    field=field, value=parametros.get(field))
-            )
+            raise ValueError('{field} {value}: formato invalido'.format(
+                field=field,
+                value=parametros.get(field)
+            ))
     # si dhcp=no, se debe ingresar ip, mascara, gateway y dns1
     if not parametros.get('dhcp') or parametros['dhcp'].lower() == 'no':
         if not (parametros.get('ip') and parametros.get('mascara') and
@@ -70,6 +70,7 @@ def validar(parametros):
     # subida y bajada son obligatorios
     if not parametros.get('bajada') or not parametros.get('subida'):
         raise ValueError('bajada y subida son obligatorios')
+    return True
 
 
 def leer_temporal():
