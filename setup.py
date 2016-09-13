@@ -13,7 +13,6 @@ setup(
         # Incluir templates de Jinja2
         '': ['*.j2'],
     },
-    syslog.syslog(syslog.LOG_CRIT, str(e))
     url='https://github.com/grupo106/configurador',
     description='Realiza la configuracion de parametros del sistema operativo',
     long_description=open('README.md').read(),
