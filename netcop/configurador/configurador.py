@@ -92,27 +92,47 @@ def borrar_temporal():
     return os.remove(TMP_CONFIG_FILE)
 
 
+def procesar_parametros(config, parametros):
+    '''
+    Procesa los parametros leidos desde los archivos de configuracion.
+    '''
+    # defino dns1 y dns2
+    if parametros.get('dns'):
+        if not config.get('dns1'):
+            config['dns1'] = parametros['dns']
+        else:
+            config['dns2'] = parametros['dns']
+        del parametros['dns']
+    # corrijo valor para dhcp
+    if parametros.get('dhcp'):
+        parametros['dhcp'] = 'si'
+    # actualizo configuracion
+    config.update(parametros)
+
+
 def obtener_config():
     '''
     Lee configuraciones actualmente aplicadas e imprime resultado en formato
     clave=valor.
     '''
-    regex = re.compile('(bajada=(?P<bajada>\d+)|'
-                        'subida=(?P<subida>\d+)|'
-                        '(?P<dhcp>dhcp)|'
-                        'address (?P<ip>(\d+\.?){4})|'
-                        'netmask (?P<mascara>(\d+\.?){4})|'
-                        'gateway (?P<gateway>(\d+\.?){4}))', flags=re.M)
-
-    config = dict()
+    regex = re.compile(
+        '''(
+            bajada=(?P<bajada>\d+) |
+            subida=(?P<subida>\d+) |
+            (?P<dhcp>dhcp) |
+            address (?P<ip>(\d+\.?){4}) |
+            netmask (?P<mascara>(\d+\.?){4}) |
+            gateway (?P<gateway>(\d+\.?){4}) |
+            dns (?P<dns>(\d+\.?){4})
+        )''',
+        flags=re.M | re.X
+    )
+    config = {}
     for path in (NETCOP_CONFIG_FILE, ):
         with open(path) as f:
-            content = f.read()
-        m = regex.search(content)
-        if m:
-            for x in regex.finditer(content):
-                a = {k:v for k, v in x.groupdict().items() if v}
-                config.update(a)
+            for m in regex.finditer(f.read()):
+                params = {k: v for k, v in m.groupdict().items() if v}
+                procesar_parametros(config, params)
     return config
 
 
