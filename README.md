@@ -1,3 +1,6 @@
+[![GitHub tag](https://img.shields.io/github/tag/Grupo106/configurador.svg?maxAge=2592000?style=plastic)](https://github.com/Grupo106/configurador/releases)
+[![Code Climate](https://codeclimate.com/github/Grupo106/configurador/badges/gpa.svg)](https://codeclimate.com/github/Grupo106/configurador)
+
 Configurador
 ==================================
 > Encargado de configurar los parámetros de sistema como la configuración de
