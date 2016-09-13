@@ -172,4 +172,4 @@ def configurar():
         template = env.get_template(template_name)
         config = template.render(**contexto)
         with open(path, 'w') as f:
-            f.write(config)
+            f.write(config.encode('utf-8'))
