@@ -7,7 +7,7 @@ setup(
     author_email='yromero@openmailbox.org',
     keywords='netcop configurador',
     packages=['netcop', 'netcop.configurador'],
-    namespace_packages = ['netcop'],
+    namespace_packages=['netcop'],
     url='https://github.com/grupo106/configurador',
     description='Realiza la configuracion de parametros del sistema operativo',
     long_description=open('README.md').read(),
