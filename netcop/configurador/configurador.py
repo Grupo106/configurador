@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Encargado de configurar los parámetros de sistema como la configuración de red,
