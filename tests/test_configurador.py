@@ -282,3 +282,25 @@ class ConfiguradorTests(unittest.TestCase):
         assert config['dns1'] == '200.67.222.222'
         assert config['dns2'] == '200.67.220.220'
         mock_open.assert_any_call(configurador.DNS_CONFIG_FILE)
+
+    @mock.patch('subprocess.call')
+    def test_aplicar_cambios(self, mock_call):
+        '''
+        Prueba la aplicacion de cambios de configuracion.
+        '''
+        mock_call.return_value = 0
+        configurador.aplicar_cambios()
+        mock_call.assert_called_with(['systemctl', 'reload',
+                                      'networking.service'])
+
+    @mock.patch('subprocess.call')
+    def test_aplicar_cambios_error(self, mock_call):
+        '''
+        Prueba el tratamiento de errores al aplicar los cambios de
+        configuracion.
+        '''
+        mock_call.return_value = 1
+        with self.assertRaises(RuntimeError):
+            configurador.aplicar_cambios()
+        mock_call.assert_called_with(['systemctl', 'reload',
+                                      'networking.service'])
