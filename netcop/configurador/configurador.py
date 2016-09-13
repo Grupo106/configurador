@@ -137,7 +137,7 @@ def obtener_config():
     return config
 
 
-def recargar_red():
+def aplicar_cambios():
     '''
     Solicita al sistema operativo que recargue la configuracion de red.
     '''
