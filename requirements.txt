@@ -1,3 +1,3 @@
-configparser>=2.8
-jinja2>=3.5.0
+configparser>=3.5.0
+jinja2>=2.8
 mock>=2.0.0
