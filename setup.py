@@ -6,8 +6,13 @@ setup(
     author='Yonatan Romero',
     author_email='yromero@openmailbox.org',
     keywords='netcop configurador',
-    packages=['netcop', 'netcop.configurador'],
+    packages=['netcop', 'netcop.configurador',
+              'netcop.configurador.templates'],
     namespace_packages=['netcop'],
+    package_data={
+        # Incluir templates de Jinja2
+        '': ['*.j2'],
+    },
     url='https://github.com/grupo106/configurador',
     description='Realiza la configuracion de parametros del sistema operativo',
     long_description=open('README.md').read(),

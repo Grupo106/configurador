@@ -219,3 +219,113 @@ class ConfiguradorTests(unittest.TestCase):
         assert config['dhcp'] == 'si'
         configurador.procesar_parametros(config, {})
         assert config['dhcp'] == 'no'
+
+    def test_obtener_parametros_netcop(self):
+        '''
+        Prueba la lectura de parametros desde /etc/netcop/netcop.config
+        '''
+        mock_open = mock.mock_open(read_data='''
+        [netcop]
+        velocidad_bajada=22
+        velocidad_subida=11
+        inside=eth1
+        outside=eth0
+        ''')
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            config = configurador.obtener_config()
+        assert config['bajada'] == '22'
+        assert config['subida'] == '11'
+        mock_open.assert_any_call(configurador.NETCOP_CONFIG_FILE)
+
+    def test_obtener_parametros_network(self):
+        '''
+        Prueba la lectura de parametros de configuracion de red
+        '''
+        mock_open = mock.mock_open(read_data='''
+        iface br0 inet static
+            address 192.168.1.253
+            netmask 255.255.255.0
+            gateway 192.168.1.1
+            bridge_ports eth0 eth1
+        ''')
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            config = configurador.obtener_config()
+        assert config['ip'] == '192.168.1.253'
+        assert config['mascara'] == '255.255.255.0'
+        assert config['gateway'] == '192.168.1.1'
+        mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE)
+
+    def test_obtener_parametros_dhcp(self):
+        '''
+        Prueba la lectura de parametros de configuracion de red cuando este
+        activado el dhcp
+        '''
+        mock_open = mock.mock_open(read_data='''
+        iface br0 inet dhcp
+            bridge_ports eth0 eth1
+        ''')
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            config = configurador.obtener_config()
+        assert config['dhcp'] == 'si'
+        mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE)
+
+    def test_obtener_parametros_dns(self):
+        '''
+        Prueba la lectura de parametros de configuracion de dns
+        '''
+        mock_open = mock.mock_open(read_data='''
+        nameserver 200.67.222.222
+        nameserver 200.67.220.220
+        ''')
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            config = configurador.obtener_config()
+        assert config['dns1'] == '200.67.222.222'
+        assert config['dns2'] == '200.67.220.220'
+        mock_open.assert_any_call(configurador.DNS_CONFIG_FILE)
+
+    @mock.patch('subprocess.call')
+    def test_aplicar_cambios(self, mock_call):
+        '''
+        Prueba la aplicacion de cambios de configuracion.
+        '''
+        mock_call.return_value = 0
+        configurador.aplicar_cambios()
+        mock_call.assert_called_with(['systemctl', 'reload',
+                                      'networking.service'])
+
+    @mock.patch('subprocess.call')
+    def test_aplicar_cambios_error(self, mock_call):
+        '''
+        Prueba el tratamiento de errores al aplicar los cambios de
+        configuracion.
+        '''
+        mock_call.return_value = 1
+        with self.assertRaises(RuntimeError):
+            configurador.aplicar_cambios()
+        mock_call.assert_called_with(['systemctl', 'reload',
+                                      'networking.service'])
+
+    @mock.patch('netcop.configurador.configurador.leer_temporal')
+    @mock.patch('netcop.configurador.configurador.validar')
+    def test_obtener_contexto(self, mock_validar, mock_leer):
+        '''
+        Prueba la funcion que provee el contexto a los templates.
+        '''
+        mock_leer.return_value = {}
+        assert configurador.obtener_contexto()
+        mock_leer.assert_called()
+        mock_validar.assert_called()
+
+    @mock.patch('netcop.configurador.configurador.obtener_contexto')
+    def test_configurar(self, mock_contexto):
+        '''
+        Prueba la funcion que provee el contexto a los templates.
+        '''
+        mock_contexto.return_value = {}
+        mock_open = mock.mock_open()
+        with mock.patch('netcop.configurador.configurador.open', mock_open):
+            configurador.configurar()
+        mock_contexto.assert_called()
+        mock_open.assert_any_call(configurador.NETCOP_CONFIG_FILE, 'w')
+        mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE, 'w')
+        mock_open.assert_any_call(configurador.DNS_CONFIG_FILE, 'w')

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
 Encargado de configurar los parámetros de sistema como la configuración de red,
@@ -149,7 +148,7 @@ def aplicar_cambios():
 
 def obtener_contexto():
     '''
-    Obtiene el contexto que se le pasaran a los templates.
+    Obtiene el contexto que se le proveerá a los templates.
     '''
     contexto = leer_temporal()
     validar(contexto)
@@ -173,4 +172,4 @@ def configurar():
         template = env.get_template(template_name)
         config = template.render(**contexto)
         with open(path, 'w') as f:
-            f.write(config)
+            f.write(config.encode('utf-8'))
