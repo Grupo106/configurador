@@ -116,6 +116,9 @@ def obtener_config():
     '''
     Lee configuraciones actualmente aplicadas.
     '''
+    # TODO: Leer configuracion de ip actualmente aplicada desde:
+    # ip addr show primary br0
+    # ip -4 route get 8.8.8.8
     regex = re.compile(
         '''(bajada=(?P<bajada>\d+) |                   # bajada
             subida=(?P<subida>\d+) |                   # subida
