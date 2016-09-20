@@ -224,24 +224,30 @@ class ConfiguradorTests(unittest.TestCase):
         assert config['subida'] == '11'
         mock_open.assert_any_call(configurador.NETCOP_CONFIG_FILE)
 
-    @unittest.skip("adaptar para llamar a obtener_config_red")
-    def test_obtener_parametros_network(self):
+    @mock.patch('subprocess.check_output')
+    def test_obtener_parametros_network(self, mock_output):
         '''
-        Prueba la lectura de parametros de configuracion de red
+        Prueba la lectura de parametros de configuracion de red actuamente
+        aplicada.
         '''
-        mock_open = mock.mock_open(read_data='''
-        iface br0 inet static
-            address 192.168.1.253
-            netmask 255.255.255.0
-            gateway 192.168.1.1
-            bridge_ports eth0 eth1
-        ''')
+        mock_open = mock.mock_open()
+        mock_output.return_value = '''
+        7: br0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state
+        UP group default
+            link/ether 52:54:00:57:39:99 brd ff:ff:ff:ff:ff:ff
+            inet 172.18.124.189/25 brd 172.18.124.255 scope global br0
+            valid_lft forever preferred_lft forever
+
+        8.8.8.8 via 172.18.124.129 dev br0  src 172.18.124.189
+            cache
+        '''
         with mock.patch('netcop.configurador.configurador.open', mock_open):
             config = configurador.obtener_config()
-        assert config['ip'] == '192.168.1.253'
-        assert config['mascara'] == '255.255.255.0'
-        assert config['gateway'] == '192.168.1.1'
+        assert config['ip'] == '172.18.124.189'
+        assert config['mascara'] == '255.255.255.128'
+        assert config['gateway'] == '172.18.124.129'
         mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE)
+        mock_output.assert_called()
 
     def test_obtener_parametros_dhcp(self):
         '''
@@ -346,3 +352,12 @@ class ConfiguradorTests(unittest.TestCase):
         mock_open.assert_any_call(configurador.NETCOP_CONFIG_FILE, 'w')
         mock_open.assert_any_call(configurador.NETWORK_CONFIG_FILE, 'w')
         mock_open.assert_any_call(configurador.DNS_CONFIG_FILE, 'w')
+
+    def test_get_mascara(self):
+        '''
+        Prueba la funcion que transforma el prefijo en una mascara de subred.
+        '''
+        assert configurador.get_mascara(8) == '255.0.0.0'
+        assert configurador.get_mascara(17) == '255.255.128.0'
+        assert configurador.get_mascara(21) == '255.255.248.0'
+        assert configurador.get_mascara(24) == '255.255.255.0'

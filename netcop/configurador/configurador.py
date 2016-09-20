@@ -28,12 +28,6 @@ DNS_CONFIG_FILE = '/etc/resolv.conf'
 # archivo de configuracion de netcop
 NETCOP_CONFIG_FILE = '/etc/netcop/netcop.config'
 
-def get_mascara(prefijo):
-    '''
-    Obtiene la mascara de subred a partir del prefijo.
-    '''
-    addr = 0xffffffff ^ 0xffffffff >> prefijo
-    return socket.inet_ntoa(struct.pack("!I", addr))
 
 def existe_archivo_temporal():
     '''
@@ -107,10 +101,8 @@ def procesar_parametros(config, parametros):
     '''
     # defino dns1 y dns2
     if parametros.get('dns'):
-        if not config.get('dns1'):
-            config['dns1'] = parametros['dns']
-        else:
-            config['dns2'] = parametros['dns']
+        key = 'dns1' if not config.get('dns1') else 'dns2'
+        config[key] = parametros['dns']
         del parametros['dns']
     # corrijo valor para dhcp
     if parametros.get('dhcp'):
@@ -131,17 +123,29 @@ def parse_cmd(command, pattern):
     return regex.search(output)
 
 
+def get_mascara(prefijo):
+    '''
+    Obtiene la mascara de subred a partir del prefijo.
+    '''
+    addr = 0xffffffff ^ 0xffffffff >> prefijo
+    return socket.inet_ntoa(struct.pack("!I", addr))
+
+
 def obtener_config_red():
     '''
     Lee la configuracion de red aplicada actualmente y devuelve diccionario
     que contiene la ip, mascara y gateway.
     '''
     # comando para obtener ip y prefijo
-    IP_INFO = ('ip addr show primary ',
-               'inet\s(?P<ip>(\d+\.?){4})/(?P<prefijo>\d+)')
+    IP_INFO = (
+        'ip addr show primary ',
+        'inet\s(?P<ip>(\d+\.?){4})/(?P<prefijo>\d+)'
+    )
     # comando para obtener gateway
-    GATEWAY_INFO = ('ip -4 route get 8.8.8.8',
-                   'via\s(?P<gateway>(\d+\.?){4})\sdev\s(?P<dev>\w+)')
+    GATEWAY_INFO = (
+        'ip -4 route get 8.8.8.8',
+        'via\s(?P<gateway>(\d+\.?){4})\sdev\s(?P<dev>\w+)'
+    )
     # obtengo el gateway
     cmd, pattern = GATEWAY_INFO
     m = parse_cmd(cmd, pattern)
@@ -175,6 +179,7 @@ def obtener_config():
                 procesar_parametros(config, params)
     config.update(obtener_config_red())
     return config
+
 
 def aplicar_cambios():
     '''
