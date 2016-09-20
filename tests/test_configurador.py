@@ -278,7 +278,7 @@ class ConfiguradorTests(unittest.TestCase):
         '''
         mock_call.return_value = 0
         configurador.aplicar_cambios()
-        mock_call.assert_called_with(['systemctl', 'reload',
+        mock_call.assert_called_with(['systemctl', 'restart',
                                       'networking.service'])
 
     @mock.patch('subprocess.call')
@@ -290,7 +290,7 @@ class ConfiguradorTests(unittest.TestCase):
         mock_call.return_value = 1
         with self.assertRaises(RuntimeError):
             configurador.aplicar_cambios()
-        mock_call.assert_called_with(['systemctl', 'reload',
+        mock_call.assert_called_with(['systemctl', 'restart',
                                       'networking.service'])
 
     @mock.patch('netcop.configurador.configurador.obtener_config_red')
