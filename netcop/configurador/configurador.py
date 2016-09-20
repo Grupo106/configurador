@@ -178,7 +178,8 @@ def obtener_config():
             for m in regex.finditer(f.read()):
                 params = {k: v for k, v in m.groupdict().items() if v}
                 procesar_parametros(config, params)
-                syslog.syslog(syslog.LOG_DEBUG, str(config))
+                syslog.syslog(syslog.LOG_DEBUG,
+                              "{0}: {1}".format(path, str(config)))
     config.update(obtener_config_red())
     syslog.syslog(syslog.LOG_DEBUG, str(config))
     return config
