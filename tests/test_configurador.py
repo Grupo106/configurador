@@ -195,18 +195,6 @@ class ConfiguradorTests(unittest.TestCase):
         assert config['dns1'] == '1.1.1.1'
         assert config['dns2'] == '3.3.3.3'
 
-    def test_procesar_parametros_dhcp(self):
-        '''
-        Prueba el procesamiento de parametros leidos desde el archivo temporal.
-
-        Correcion de valor de dhcp
-        '''
-        config = {}
-        configurador.procesar_parametros(config, {'dhcp': 'dhcp'})
-        assert config['dhcp'] == 'si'
-        configurador.procesar_parametros(config, {})
-        assert config['dhcp'] == 'no'
-
     def test_obtener_parametros_netcop(self):
         '''
         Prueba la lectura de parametros desde /etc/netcop/netcop.config

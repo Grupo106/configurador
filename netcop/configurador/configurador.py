@@ -105,11 +105,6 @@ def procesar_parametros(config, parametros):
         key = 'dns1' if not config.get('dns1') else 'dns2'
         config[key] = parametros['dns']
         del parametros['dns']
-    # corrijo valor para dhcp
-    if parametros.get('dhcp'):
-        parametros['dhcp'] = 'si'
-    else:
-        parametros['dhcp'] = 'no'
     # actualizo configuracion
     config.update(parametros)
 
@@ -181,6 +176,8 @@ def obtener_config():
                 syslog.syslog(syslog.LOG_DEBUG,
                               "{0}: {1}".format(path, str(config)))
     config.update(obtener_config_red())
+    # corrijo valor para dhcp
+    config['dhcp'] = 'si' if config.get('dhcp') else 'no'
     syslog.syslog(syslog.LOG_DEBUG, "Config: %s" % str(config))
     return config
 
