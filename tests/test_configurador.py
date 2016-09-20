@@ -255,6 +255,12 @@ class ConfiguradorTests(unittest.TestCase):
         activado el dhcp
         '''
         mock_open = mock.mock_open(read_data='''
+        [netcop]
+        velocidad_bajada=22
+        velocidad_subida=11
+        inside=eth1
+        outside=eth0
+
         iface br0 inet dhcp
             bridge_ports eth0 eth1
         ''')
