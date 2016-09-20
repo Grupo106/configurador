@@ -173,7 +173,7 @@ def obtener_config():
         flags=re.M | re.X
     )
     config = {}
-    for path in (NETCOP_CONFIG_FILE, NETWORK_CONFIG_FILE, DNS_CONFIG_FILE):
+    for path in (NETWORK_CONFIG_FILE, NETCOP_CONFIG_FILE, DNS_CONFIG_FILE):
         with open(path) as f:
             for m in regex.finditer(f.read()):
                 params = {k: v for k, v in m.groupdict().items() if v}
