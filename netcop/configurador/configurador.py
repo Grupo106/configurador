@@ -10,6 +10,8 @@ de Administrador.
 '''
 import os
 import re
+import socket
+import struct
 import subprocess
 import configparser
 from . import config
@@ -26,6 +28,12 @@ DNS_CONFIG_FILE = '/etc/resolv.conf'
 # archivo de configuracion de netcop
 NETCOP_CONFIG_FILE = '/etc/netcop/netcop.config'
 
+def get_mascara(prefijo):
+    '''
+    Obtiene la mascara de subred a partir del prefijo.
+    '''
+    addr = 0xffffffff ^ 0xffffffff >> prefijo
+    return socket.inet_ntoa(struct.pack("!I", addr))
 
 def existe_archivo_temporal():
     '''
@@ -112,20 +120,48 @@ def procesar_parametros(config, parametros):
     config.update(parametros)
 
 
+def parse_cmd(command, pattern):
+    '''
+    Ejecuta el comando ´command´ y lo parsea con la expresion regular ´regex´.
+    Devuelve objeto re.Matchcmd
+    '''
+    output = subprocess.check_output(command, shell=True)
+    regex = re.compile(pattern)
+    return regex.search(output)
+
+
+def obtener_config_red():
+    '''
+    Lee la configuracion de red aplicada actualmente y devuelve diccionario
+    que contiene la ip, mascara y gateway.
+    '''
+    # comando para obtener ip y prefijo
+    IP_INFO = ('ip addr show primary ',
+               'inet\s(?P<ip>(\d+\.?){4})/(?P<prefijo>\d+)')
+    # comando para obtener gateway
+    GATEWAY_INFO = ('ip -4 route get 8.8.8.8',
+                   'via\s(?P<gateway>(\d+\.?){4})\sdev\s(?P<dev>\w+)')
+    # obtengo el gateway
+    cmd, pattern = GATEWAY_INFO
+    m = parse_cmd(cmd, pattern)
+    data = {'gateway': m.group('gateway')}
+    # obtengo ip de la interfaz principal
+    cmd, pattern = IP_INFO
+    m = parse_cmd(cmd + m.group('dev'), pattern)
+    data['ip'] = m.group('ip')
+    data['mascara'] = get_mascara(int(m.group('prefijo')))
+    # devuelvo informacion de red
+    return data
+
+
 def obtener_config():
     '''
     Lee configuraciones actualmente aplicadas.
     '''
-    # TODO: Leer configuracion de ip actualmente aplicada desde:
-    # ip addr show primary br0
-    # ip -4 route get 8.8.8.8
     regex = re.compile(
         '''(bajada=(?P<bajada>\d+) |                   # bajada
             subida=(?P<subida>\d+) |                   # subida
             (?P<dhcp>dhcp) |                           # dhcp
-            address\s+(?P<ip>(\d+\.?){4}) |            # ip
-            netmask\s+(?P<mascara>(\d+\.?){4}) |       # mascara
-            gateway\s+(?P<gateway>(\d+\.?){4}) |       # gateway
             nameserver\s+(?P<dns>(\d+\.?){4})          # dns1 o dns2
         )''',
         flags=re.M | re.X
@@ -136,8 +172,8 @@ def obtener_config():
             for m in regex.finditer(f.read()):
                 params = {k: v for k, v in m.groupdict().items() if v}
                 procesar_parametros(config, params)
+    config.update(obtener_config_red())
     return config
-
 
 def aplicar_cambios():
     '''
