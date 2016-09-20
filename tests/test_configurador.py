@@ -19,12 +19,8 @@ class ConfiguradorTests(unittest.TestCase):
         parametros = {
             'subida': '1',
             'bajada': '1',
-            'ip': '1.1.1.1',
-            'mascara': '255.0.0.0',
-            'gateway': '1.1.1.1',
-            'dns1': '1.1.1.1',
+            'dhcp': 'si'
         }
-        parametros['dhcp'] = 'si'
         assert configurador.validar(parametros)
         parametros['dhcp'] = 'SI'
         assert configurador.validar(parametros)
@@ -63,11 +59,10 @@ class ConfiguradorTests(unittest.TestCase):
             'subida': '1',
             'bajada': '1',
             'dns1': '1.1.1.1',
-            'ip': '1.1.1.1',
+            'ip': '256.1.1.1',
             'mascara': '1.1.1.1',
             'gateway': '1.1.1.1',
         }
-        parametros['ip'] = '256.1.1.1'
         with self.assertRaises(ValueError):
             assert configurador.validar(parametros)
         parametros['ip'] = '1.1.1.1'
@@ -86,6 +81,10 @@ class ConfiguradorTests(unittest.TestCase):
         parametros['dns2'] = '256.1.1.1'
         with self.assertRaises(ValueError):
             assert configurador.validar(parametros)
+        del parametros['dns2']
+        del parametros['mascara']
+        with self.assertRaises(ValueError):
+            assert configurador.validar(parametros)
 
     def test_validar_dhcp_no(self):
         '''
@@ -96,18 +95,6 @@ class ConfiguradorTests(unittest.TestCase):
             'subida': '1',
             'bajada': '1',
         }
-        with self.assertRaises(ValueError):
-            assert configurador.validar(parametros)
-        parametros['ip'] = '1.1.1.1'
-        with self.assertRaises(ValueError):
-            assert configurador.validar(parametros)
-        parametros['mascara'] = '1.1.1.1'
-        with self.assertRaises(ValueError):
-            assert configurador.validar(parametros)
-        parametros['gateway'] = '1.1.1.1'
-        with self.assertRaises(ValueError):
-            assert configurador.validar(parametros)
-        parametros['dns1'] = '1.1.1.1'
         assert configurador.validar(parametros)
 
     def test_validar_subida_bajada(self):
@@ -306,16 +293,45 @@ class ConfiguradorTests(unittest.TestCase):
         mock_call.assert_called_with(['systemctl', 'reload',
                                       'networking.service'])
 
+    @mock.patch('netcop.configurador.configurador.obtener_config_red')
     @mock.patch('netcop.configurador.configurador.leer_temporal')
     @mock.patch('netcop.configurador.configurador.validar')
-    def test_obtener_contexto(self, mock_validar, mock_leer):
+    def test_obtener_contexto_con_config_red(self, mock_validar, mock_leer,
+                                             mock_config_red):
         '''
         Prueba la funcion que provee el contexto a los templates.
+        '''
+        # con ip dinamica
+        mock_leer.return_value = {'dhcp': 'si'}
+        assert configurador.obtener_contexto()
+        mock_leer.assert_called()
+        mock_validar.assert_called()
+        mock_config_red.assert_not_called()
+        # con ip fija
+        mock_leer.return_value = {
+            'ip': '1.1.1.1',
+            'mascara': '255.0.0.0',
+            'gateway': '1.0.0.1'
+        }
+        assert configurador.obtener_contexto()
+        mock_leer.assert_called()
+        mock_validar.assert_called()
+        mock_config_red.assert_not_called()
+
+    @mock.patch('netcop.configurador.configurador.obtener_config_red')
+    @mock.patch('netcop.configurador.configurador.leer_temporal')
+    @mock.patch('netcop.configurador.configurador.validar')
+    def test_obtener_contexto_sin_config_red(self, mock_validar, mock_leer,
+                                             mock_config_red):
+        '''
+        Prueba la funcion que provee el contexto a los templates cuando no se
+        brinda configuracion de red.
         '''
         mock_leer.return_value = {}
         assert configurador.obtener_contexto()
         mock_leer.assert_called()
         mock_validar.assert_called()
+        mock_config_red.assert_called()
 
     @mock.patch('netcop.configurador.configurador.obtener_contexto')
     def test_configurar(self, mock_contexto):

@@ -68,11 +68,12 @@ def validar(parametros):
                 field=field,
                 value=parametros.get(field)
             ))
-    # si dhcp=no, se debe ingresar ip, mascara, gateway y dns1
-    if not parametros.get('dhcp') or parametros['dhcp'].lower() == 'no':
+    # si se ingresa ip, se debe ingresar mascara, gateway y dns1
+    if (parametros.get('ip') or parametros.get('mascara') or
+            parametros.get('gateway')):
         if not (parametros.get('ip') and parametros.get('mascara') and
                 parametros.get('gateway') and parametros.get('dns1')):
-            raise ValueError('Si dhcp=no debe ingresar ip, mascara, gateway y '
+            raise ValueError('Si ingresa ip debe ingresar mascara, gateway y '
                              'dns1 obligatoriamente')
     # subida y bajada son obligatorios
     if not parametros.get('bajada') or not parametros.get('subida'):
@@ -191,6 +192,10 @@ def obtener_contexto():
     '''
     contexto = leer_temporal()
     validar(contexto)
+    # si no se especifica configuracion de red, utilizo la configuracion de red
+    # actualmente aplicada
+    if not contexto.get('dhcp') and not contexto.get('ip'):
+        contexto.update(obtener_config_red())
     contexto.update(config.DATABASE)
     contexto.update(config.NETCOP)
     return contexto
