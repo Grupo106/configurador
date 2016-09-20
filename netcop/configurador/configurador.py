@@ -186,7 +186,7 @@ def aplicar_cambios():
     '''
     Solicita al sistema operativo que recargue la configuracion de red.
     '''
-    retcode = subprocess.call(['systemctl', 'reload', 'networking.service'])
+    retcode = subprocess.call(['systemctl', 'restart', 'networking.service'])
     if retcode != 0:
         raise RuntimeError('No se pudo recargar la configuración de red. '
                            'Verifique privilegios.')
