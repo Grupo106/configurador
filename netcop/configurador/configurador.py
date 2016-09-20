@@ -139,12 +139,12 @@ def obtener_config_red():
     # comando para obtener ip y prefijo
     IP_INFO = (
         'ip addr show primary ',
-        'inet\s(?P<ip>(\d+\.?){4})/(?P<prefijo>\d+)'
+        'inet\s+(?P<ip>(\d+\.?){4})/(?P<prefijo>\d+)'
     )
     # comando para obtener gateway
     GATEWAY_INFO = (
         'ip -4 route get 8.8.8.8',
-        'via\s(?P<gateway>(\d+\.?){4})\sdev\s(?P<dev>\w+)'
+        'via\s+(?P<gateway>(\d+\.?){4})\s+dev\s+(?P<dev>\w+)'
     )
     # obtengo el gateway
     cmd, pattern = GATEWAY_INFO
