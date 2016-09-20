@@ -12,6 +12,7 @@ import os
 import re
 import socket
 import struct
+import syslog
 import subprocess
 import configparser
 from . import config
@@ -163,11 +164,11 @@ def obtener_config():
     '''
     Lee configuraciones actualmente aplicadas.
     '''
-    regex = re.compile(
-        '''(bajada=(?P<bajada>\d+) |                   # bajada
-            subida=(?P<subida>\d+) |                   # subida
-            (?P<dhcp>dhcp) |                           # dhcp
-            nameserver\s+(?P<dns>(\d+\.?){4})          # dns1 o dns2
+    regex = re.compile('''(
+            bajada=(?P<bajada>\d+) |          # bajada
+            subida=(?P<subida>\d+) |          # subida
+            (?P<dhcp>dhcp) |                  # dhcp
+            nameserver\s+(?P<dns>(\d+\.?){4}) # dns1 o dns2
         )''',
         flags=re.M | re.X
     )
@@ -177,7 +178,9 @@ def obtener_config():
             for m in regex.finditer(f.read()):
                 params = {k: v for k, v in m.groupdict().items() if v}
                 procesar_parametros(config, params)
+                syslog.syslog(syslog.LOG_DEBUG, str(config))
     config.update(obtener_config_red())
+    syslog.syslog(syslog.LOG_DEBUG, str(config))
     return config
 
 
