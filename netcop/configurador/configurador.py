@@ -181,7 +181,7 @@ def obtener_config():
                 syslog.syslog(syslog.LOG_DEBUG,
                               "{0}: {1}".format(path, str(config)))
     config.update(obtener_config_red())
-    syslog.syslog(syslog.LOG_DEBUG, str(config))
+    syslog.syslog(syslog.LOG_DEBUG, "Config: %s" % str(config))
     return config
 
 
