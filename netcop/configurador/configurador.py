@@ -64,12 +64,9 @@ def validar(parametros):
                 value=parametros.get(field)
             ))
     # si se ingresa ip, se debe ingresar mascara, gateway y dns1
-    if (parametros.get('ip') or parametros.get('mascara') or
-            parametros.get('gateway')):
-        if not (parametros.get('ip') and parametros.get('mascara') and
-                parametros.get('gateway') and parametros.get('dns1')):
-            raise ValueError('Si ingresa ip debe ingresar mascara, gateway y '
-                             'dns1 obligatoriamente')
+    if parametros.get('ip') or parametros.get('mascara'):
+        if not (parametros.get('ip') and parametros.get('mascara')):
+            raise ValueError('Debe ingresar ip y mascara de subred')
     # subida y bajada son obligatorios
     if not parametros.get('bajada') or not parametros.get('subida'):
         raise ValueError('bajada y subida son obligatorios')
