@@ -209,9 +209,9 @@ def configurar():
     Escribe configuracion en los archivos correspondientes.
     '''
     FILES = (
-        (NETWORK_CONFIG_FILE, 'br0.j2'),
-        (DNS_CONFIG_FILE, 'resolv.conf.j2'),
-        (NETCOP_CONFIG_FILE, 'netcop.config.j2'),
+        (NETWORK_CONFIG_FILE, 'br0.jinja'),
+        (DNS_CONFIG_FILE, 'resolv.conf.jinja'),
+        (NETCOP_CONFIG_FILE, 'netcop.config.jinja'),
     )
     contexto = obtener_contexto()
     env = Environment(loader=PackageLoader(__package__))

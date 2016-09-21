@@ -11,7 +11,7 @@ setup(
     namespace_packages=['netcop'],
     package_data={
         # Incluir templates de Jinja2
-        '': ['*.j2'],
+        '': ['*.jinja'],
     },
     url='https://github.com/grupo106/configurador',
     description='Realiza la configuracion de parametros del sistema operativo',
