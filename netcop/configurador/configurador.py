@@ -210,8 +210,8 @@ def configurar():
     '''
     FILES = (
         (NETWORK_CONFIG_FILE, 'br0.jinja'),
-        (DNS_CONFIG_FILE, 'resolv.conf.jinja'),
-        (NETCOP_CONFIG_FILE, 'netcop.config.jinja'),
+        (DNS_CONFIG_FILE, 'resolv.jinja'),
+        (NETCOP_CONFIG_FILE, 'netcop.jinja'),
     )
     contexto = obtener_contexto()
     env = Environment(loader=PackageLoader(__package__))
